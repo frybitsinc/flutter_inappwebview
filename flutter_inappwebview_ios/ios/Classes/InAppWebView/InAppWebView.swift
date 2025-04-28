@@ -281,7 +281,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
         
-        return super.hitTest(point, with: event)
+        // Ask the system what view would normally get the touch:
+        let hitView = super.hitTest(point, with: event)
+        // Find the actual WKContentView subview (the web-rendering layer):
+        if let contentView = scrollView.subviews.first(
+             where: { NSStringFromClass(type(of: $0)) == "WKContentView" }
+       ),
+       // And if the system didn’t already hit the content view:
+       hitView !== contentView
+        {
+            // Send the touch straight into it (so both clicks and drags work):
+            return contentView
+        }
+        // Otherwise, just return what the system found:
+        return hitView
     }
     
     @available(iOS 13.0, *)
