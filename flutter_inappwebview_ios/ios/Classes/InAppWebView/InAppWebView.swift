@@ -75,6 +75,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     init(id: Any?, plugin: SwiftFlutterPlugin?, frame: CGRect, configuration: WKWebViewConfiguration,
          contextMenu: [String: Any]?, userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
+        // Ensure touches go through without delay or cancellation
+        self.scrollView.delaysContentTouches = false
+        self.scrollView.canCancelContentTouches = true
+        if let gestures = self.scrollView.gestureRecognizers {
+          for gesture in gestures {
+            gesture.delaysTouchesBegan = false
+          }
+        }
         self.id = id
         self.plugin = plugin
         if let id = id, let registrar = plugin?.registrar {
